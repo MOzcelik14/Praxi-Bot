@@ -6,6 +6,7 @@
 
   /* Spacing tokens */
   --space-0: 0px;
+  --space-half: 2px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -34,6 +35,7 @@
   --size-control-sm: 30px;
   --size-control-md: 36px;
   --size-control-lg: 42px;
+  --size-list-max: 210px;
   --size-sidebar-width: 260px;
   --size-content-max: 760px;
   --size-preview-height: 120px;
@@ -47,6 +49,7 @@
   --corner-scale: 1;
   --radius-sm: calc(6px * var(--corner-scale));
   --radius-md: calc(8px * var(--corner-scale));
+  --radius-control: calc(10px * var(--corner-scale));
   --radius-card: calc(12px * var(--corner-scale));
   --radius-pill: 9999px;
 

@@ -652,7 +652,7 @@
   margin: var(--space-0);
   padding: var(--space-0);
   list-style: none;
-  max-height: calc(var(--size-control-lg) * 5);
+  max-height: var(--size-list-max);
   overflow-y: auto;
 }
 
