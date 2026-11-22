@@ -395,6 +395,16 @@ pub(crate) async fn run_checks(s: &AppState, deadline: Instant, permit: &RunPerm
         "disk space",
         Box::new(move || doctor::check_disk(&d)),
     );
+    let d = data_dir.clone();
+    add(
+        "local_models",
+        "local models",
+        Box::new(move || {
+            let hw = provider_catalog::probe_hardware(&d);
+            let advice = provider_catalog::recommend(&hw, &provider_catalog::catalog_candidates());
+            doctor::check_local_models(&hw, &advice)
+        }),
+    );
     let d = data_dir;
     add(
         "clock",
