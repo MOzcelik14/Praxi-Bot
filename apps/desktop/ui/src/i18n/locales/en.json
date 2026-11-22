@@ -2178,11 +2178,14 @@
     "empty": "Your bots have not done anything today.",
     "failed": "Failed: {{count}}",
     "noCalls": "No model calls yet.",
+    "notifyPrivate": "Your daily summary is ready. Open the app to read it.",
+    "notifyTitle": "Your bots today",
     "ofLimit": "That is {{percent}} of the daily limit.",
     "running": "Running: {{count}}",
     "stopped": "Stopped: {{count}}",
     "subtitle": "What your bots did since midnight and what it cost.",
     "title": "Today",
+    "totalCost": "Cost: {{cost}}",
     "waiting": "Waiting for you: {{count}}"
   },
   "engineConsent": {
@@ -3712,6 +3715,7 @@
     "held": "Held (quiet hours)",
     "heldMuted": "Held (bot muted)",
     "kind": {
+      "digest": "Daily summary",
       "failed": "Run failed",
       "longRun": "Long run finished",
       "needsYou": "Needs you",
@@ -3945,6 +3949,36 @@
     "thisComputer": "This computer",
     "thisComputerHint": "Your bots run here. No server needed.",
     "title": "Where do my bots run?"
+  },
+  "runReport": {
+    "answered": "You answered",
+    "approved": "You allowed it",
+    "asked": "Asked you a question",
+    "askedCredential": "Asked for a password or key",
+    "button": "Timeline",
+    "credentialCancelled": "You cancelled",
+    "credentialSaved": "You saved it",
+    "declined": "Not allowed",
+    "exportHtml": "Save as web page",
+    "exportMarkdown": "Save as text",
+    "exported": "Report saved",
+    "footer": "Made with Praxi. Private details are left out.",
+    "hint": "See what the bot did in this run, step by step",
+    "noSteps": "The bot did not use any tools in this run.",
+    "outcome": "Result",
+    "outcomes": {
+      "done": "Finished",
+      "failed": "Failed",
+      "stopped": "Stopped by you",
+      "unfinished": "Not finished"
+    },
+    "privacy": "Private details are left out: what was typed, read or answered is not shown, and anything that looks like a password or key is hidden.",
+    "started": "Started",
+    "title": "What the bot did",
+    "took": "Took",
+    "tookTime": "Took {{time}}",
+    "unanswered": "No answer",
+    "waitingForYou": "Waiting for you"
   },
   "runStatus": {
     "showCard": "Show",
@@ -4293,6 +4327,12 @@
       },
       "noFile": "No background image selected",
       "title": "Background Image"
+    },
+    "digest": {
+      "enabled": "Send a daily summary",
+      "enabledHint": "One short notification a day with what your bots did and what it cost. Quiet hours apply: during them it only goes to the notification history.",
+      "time": "Send it at",
+      "title": "Daily summary"
     },
     "hotkey": {
       "currentLabel": "Active shortcut",
