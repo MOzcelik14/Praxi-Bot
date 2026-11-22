@@ -22783,7 +22783,7 @@
           },
           "mime": {
             "type": "string",
-            "description": "MIME type of the recording, e.g. `audio/webm`."
+            "description": "MIME type of the recording, e.g. `audio/webm` (Whisper) or `audio/pcm` (Gemini Live: 16-bit LE, 16 kHz, mono)."
           }
         }
       },
@@ -23092,11 +23092,22 @@
         "type": "object",
         "description": "Dictation configuration (`GET /v1/voice`): non-secret fields only.",
         "required": [
+          "stt_provider",
+          "gemini_model",
+          "gemini_key_set",
           "stt_base_url",
           "stt_model",
           "stt_key_set"
         ],
         "properties": {
+          "gemini_key_set": {
+            "type": "boolean",
+            "description": "Whether a Gemini API key is stored (never returned)."
+          },
+          "gemini_model": {
+            "type": "string",
+            "description": "Gemini Live model used for transcription (e.g. `gemini-3.5-transcribe-live`)."
+          },
           "stt_base_url": {
             "type": "string",
             "description": "Base URL of the OpenAI-compatible transcription service (without `/audio/transcriptions`)."
@@ -23108,6 +23119,10 @@
           "stt_model": {
             "type": "string",
             "description": "Model name sent with each request."
+          },
+          "stt_provider": {
+            "$ref": "#/components/schemas/VoiceProvider",
+            "description": "The active speech-to-text provider."
           }
         }
       },
@@ -23115,12 +23130,33 @@
         "type": "object",
         "description": "Body of `PUT /v1/voice`; omitted fields keep their value.",
         "properties": {
+          "clear_gemini_key": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Remove the stored Gemini key."
+          },
           "clear_stt_key": {
             "type": [
               "boolean",
               "null"
             ],
             "description": "Remove the stored key."
+          },
+          "gemini_key": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Gemini API key (**write-only**: secret store, never returned or logged)."
+          },
+          "gemini_model": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Gemini Live model name."
           },
           "stt_base_url": {
             "type": [
@@ -23142,8 +23178,27 @@
               "null"
             ],
             "description": "Model name."
+          },
+          "stt_provider": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/VoiceProvider",
+                "description": "Switch the provider."
+              }
+            ]
           }
         }
+      },
+      "VoiceProvider": {
+        "type": "string",
+        "description": "Which service turns speech into text.",
+        "enum": [
+          "whisper",
+          "gemini_live"
+        ]
       },
       "WebSearchConfigDto": {
         "type": "object",
