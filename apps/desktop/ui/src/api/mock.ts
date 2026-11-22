@@ -1991,11 +1991,30 @@ export class MockApiClient extends ApiClient {
     return merged;
   }
 
-  private voice = { stt_base_url: "https://api.openai.com/v1", stt_model: "whisper-1", stt_key_set: false };
+  private voice = {
+    stt_base_url: "https://api.openai.com/v1",
+    stt_model: "whisper-1",
+    stt_key_set: false,
+    stt_provider: "whisper",
+    gemini_model: "gemini-3.5-transcribe-live",
+    gemini_key_set: false
+  };
 
   private voiceConfig(body: unknown): unknown {
-    const b = (body ?? {}) as { stt_base_url?: string; stt_model?: string; stt_key?: string; clear_stt_key?: boolean };
+    const b = (body ?? {}) as {
+      stt_base_url?: string;
+      stt_model?: string;
+      stt_key?: string;
+      clear_stt_key?: boolean;
+      stt_provider?: string;
+      gemini_model?: string;
+      gemini_key?: string;
+      clear_gemini_key?: boolean;
+    };
     this.voice = {
+      stt_provider: b.stt_provider || this.voice.stt_provider,
+      gemini_model: b.gemini_model || this.voice.gemini_model,
+      gemini_key_set: b.clear_gemini_key ? false : b.gemini_key ? true : this.voice.gemini_key_set,
       stt_base_url: b.stt_base_url || this.voice.stt_base_url,
       stt_model: b.stt_model || this.voice.stt_model,
       stt_key_set: b.clear_stt_key ? false : b.stt_key ? true : this.voice.stt_key_set

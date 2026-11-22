@@ -7506,7 +7506,7 @@ export interface components {
             audio_base64: string;
             /** @description Optional ISO-639-1 language hint (`en`, `tr`, `de`). */
             language?: string | null;
-            /** @description MIME type of the recording, e.g. `audio/webm`. */
+            /** @description MIME type of the recording, e.g. `audio/webm` (Whisper) or `audio/pcm` (Gemini Live: 16-bit LE, 16 kHz, mono). */
             mime: string;
         };
         /** @description Result of `POST /v1/voice/transcribe`. */
@@ -7636,24 +7636,42 @@ export interface components {
         ViewState: "watch" | "acquiring" | "active" | "paused" | "unavailable" | "closed";
         /** @description Dictation configuration (`GET /v1/voice`): non-secret fields only. */
         VoiceConfigDto: {
+            /** @description Whether a Gemini API key is stored (never returned). */
+            gemini_key_set: boolean;
+            /** @description Gemini Live model used for transcription (e.g. `gemini-3.5-transcribe-live`). */
+            gemini_model: string;
             /** @description Base URL of the OpenAI-compatible transcription service (without `/audio/transcriptions`). */
             stt_base_url: string;
             /** @description Whether an API key is stored (never returned). */
             stt_key_set: boolean;
             /** @description Model name sent with each request. */
             stt_model: string;
+            /** @description The active speech-to-text provider. */
+            stt_provider: components["schemas"]["VoiceProvider"];
         };
         /** @description Body of `PUT /v1/voice`; omitted fields keep their value. */
         VoiceConfigInput: {
+            /** @description Remove the stored Gemini key. */
+            clear_gemini_key?: boolean | null;
             /** @description Remove the stored key. */
             clear_stt_key?: boolean | null;
+            /** @description Gemini API key (**write-only**: secret store, never returned or logged). */
+            gemini_key?: string | null;
+            /** @description Gemini Live model name. */
+            gemini_model?: string | null;
             /** @description `https://...`, or `http://` for a loopback server only. */
             stt_base_url?: string | null;
             /** @description API key (**write-only**: stored in the secret store, never returned or logged). */
             stt_key?: string | null;
             /** @description Model name. */
             stt_model?: string | null;
+            stt_provider?: null | components["schemas"]["VoiceProvider"];
         };
+        /**
+         * @description Which service turns speech into text.
+         * @enum {string}
+         */
+        VoiceProvider: "whisper" | "gemini_live";
         /**
          * @description Current web search configuration (`GET /v1/web/search`): non-secret fields
          *     only.
