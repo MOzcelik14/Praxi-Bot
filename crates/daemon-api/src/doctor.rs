@@ -1058,7 +1058,9 @@ pub fn check_local_models(
     const ID: &str = "local_models";
     const N: &str = "local models";
     let gib = |b: u64| format!("{} GiB", (b + (1 << 29)) >> 30);
-    let ram = hw.ram_bytes.map_or_else(|| "RAM unknown".to_owned(), |b| format!("{} RAM", gib(b)));
+    let ram = hw
+        .ram_bytes
+        .map_or_else(|| "RAM unknown".to_owned(), |b| format!("{} RAM", gib(b)));
     let gpu = if hw.unified_memory {
         "unified memory (Apple silicon)".to_owned()
     } else {

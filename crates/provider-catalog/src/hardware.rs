@@ -286,7 +286,11 @@ mod tests {
     #[test]
     fn a_missing_tool_is_none_not_an_error() {
         assert_eq!(
-            run_bounded("praxi-definitely-not-a-tool", &[], Duration::from_millis(200)),
+            run_bounded(
+                "praxi-definitely-not-a-tool",
+                &[],
+                Duration::from_millis(200)
+            ),
             None
         );
     }

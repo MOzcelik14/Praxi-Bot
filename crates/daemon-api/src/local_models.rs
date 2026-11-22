@@ -166,7 +166,10 @@ pub fn build_report(
     LocalModelsDto {
         hardware: HardwareDto::from(hw),
         advice: LocalAdviceDto::from(&advice),
-        runtimes: vec![runtime("ollama", Some(ollama_on_path)), runtime("lmstudio", None)],
+        runtimes: vec![
+            runtime("ollama", Some(ollama_on_path)),
+            runtime("lmstudio", None),
+        ],
     }
 }
 
@@ -215,6 +218,9 @@ mod tests {
         assert!(r.runtimes[0].running && r.runtimes[0].installed == Some(true));
         assert!(!r.runtimes[1].running);
         let best = r.advice.recommended.expect("recommendation");
-        assert_eq!(r.advice.models[0].pull_command, format!("ollama pull {best}"));
+        assert_eq!(
+            r.advice.models[0].pull_command,
+            format!("ollama pull {best}")
+        );
     }
 }

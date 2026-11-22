@@ -14,7 +14,7 @@ use serde::Serialize;
 
 use crate::{
     hardware::HardwareInfo,
-    model_metadata::{CuratedModels, embedded_metadata},
+    model_metadata::{CuratedModels, embedded_metadata, safe_model_id},
 };
 
 const GIB: f64 = 1_073_741_824.0;
@@ -112,6 +112,7 @@ pub fn candidates_from(table: &CuratedModels) -> Vec<Candidate> {
         .models
         .iter()
         .filter(|m| m.recommended && !m.deprecated && m.kind.is_chat())
+        .filter(|m| safe_command_id(&m.id))
         .map(|m| Candidate {
             id: m.id.clone(),
             display_name: m.display_name.clone(),
@@ -130,7 +131,15 @@ pub fn params_billions(id: &str) -> Option<f64> {
     if !(rest == "b" || rest.starts_with("b-") || rest.starts_with("b_")) {
         return None;
     }
-    number.parse::<f64>().ok().filter(|b| *b > 0.0 && *b < 2000.0)
+    number
+        .parse::<f64>()
+        .ok()
+        .filter(|b| *b > 0.0 && *b < 2000.0)
+}
+
+/// An id is only ever put into a copyable shell command when it is plain and cannot be read as a flag.
+fn safe_command_id(id: &str) -> bool {
+    safe_model_id(id) && !id.starts_with('-')
 }
 
 fn needs_gib(billions: f64) -> f64 {
@@ -156,9 +165,17 @@ pub fn recommend(hw: &HardwareInfo, candidates: &[Candidate]) -> LocalAdvice {
         let b = ram_gib.map(|r| r * APPLE_RAM_SHARE);
         (MemoryBasis::Unified, b, None)
     } else if let (Some(vram), Some(_)) = (vram_gib, ram_gib) {
-        (MemoryBasis::Vram, Some(vram), ram_gib.map(|r| r * CPU_RAM_SHARE))
+        (
+            MemoryBasis::Vram,
+            Some(vram),
+            ram_gib.map(|r| r * CPU_RAM_SHARE),
+        )
     } else if ram_gib.is_some() {
-        (MemoryBasis::CpuRam, None, ram_gib.map(|r| r * CPU_RAM_SHARE))
+        (
+            MemoryBasis::CpuRam,
+            None,
+            ram_gib.map(|r| r * CPU_RAM_SHARE),
+        )
     } else {
         (MemoryBasis::Unknown, None, None)
     };
@@ -166,15 +183,21 @@ pub fn recommend(hw: &HardwareInfo, candidates: &[Candidate]) -> LocalAdvice {
     let mut models: Vec<Recommendation> = candidates
         .iter()
         .filter_map(|c| {
+            if !safe_command_id(&c.id) {
+                return None;
+            }
             let billions = params_billions(&c.id)?;
             let need = needs_gib(billions);
             let fit = match basis {
                 MemoryBasis::Unknown => return None,
-                MemoryBasis::Unified | MemoryBasis::Vram if fast_budget.is_some_and(|b| need <= b) => {
+                MemoryBasis::Unified | MemoryBasis::Vram
+                    if fast_budget.is_some_and(|b| need <= b) =>
+                {
                     Fit::Comfortable
                 }
                 MemoryBasis::CpuRam
-                    if slow_budget.is_some_and(|b| need <= b) && billions <= CPU_COMFORTABLE_BILLIONS =>
+                    if slow_budget.is_some_and(|b| need <= b)
+                        && billions <= CPU_COMFORTABLE_BILLIONS =>
                 {
                     Fit::Comfortable
                 }
@@ -203,7 +226,11 @@ pub fn recommend(hw: &HardwareInfo, candidates: &[Candidate]) -> LocalAdvice {
         rank(a).cmp(&rank(b)).then_with(|| {
             let by_size = a.params_billions.total_cmp(&b.params_billions);
             // Larger first among comfortable; smaller first among the rest.
-            if a.fit == Fit::Comfortable { by_size.reverse() } else { by_size }
+            if a.fit == Fit::Comfortable {
+                by_size.reverse()
+            } else {
+                by_size
+            }
         })
     });
 
@@ -211,11 +238,15 @@ pub fn recommend(hw: &HardwareInfo, candidates: &[Candidate]) -> LocalAdvice {
         .iter()
         .filter(|m| m.fit == Fit::Comfortable)
         .map(|m| m.params_billions)
-        .fold(None, |acc: Option<f64>, b| Some(acc.map_or(b, |a| a.max(b))))
+        .fold(None, |acc: Option<f64>, b| {
+            Some(acc.map_or(b, |a| a.max(b)))
+        })
         .or_else(|| comfortable_ceiling(basis, fast_budget, slow_budget));
+    // `models` is ranked best first (comfortable largest first), so the first entry that fits and
+    // has room on disk is the largest model that works here.
     let recommended = models
-        .first()
-        .filter(|m| m.fit != Fit::TooLarge && m.disk_ok != Some(false))
+        .iter()
+        .find(|m| m.fit != Fit::TooLarge && m.disk_ok != Some(false))
         .map(|m| m.model_id.clone());
 
     LocalAdvice {
@@ -242,7 +273,11 @@ fn comfortable_ceiling(basis: MemoryBasis, fast: Option<f64>, slow: Option<f64>)
 /// looks at the file system; nothing is executed.
 #[must_use]
 pub fn on_path(name: &str, path_var: &OsStr) -> bool {
-    let exts: &[&str] = if cfg!(windows) { &["", ".exe", ".cmd", ".bat"] } else { &[""] };
+    let exts: &[&str] = if cfg!(windows) {
+        &["", ".exe", ".cmd", ".bat"]
+    } else {
+        &[""]
+    };
     std::env::split_paths(path_var).any(|dir| {
         exts.iter()
             .any(|ext| Path::new(&dir).join(format!("{name}{ext}")).is_file())
@@ -297,9 +332,24 @@ mod tests {
         // (profile, expected fits for 30b/4b/70b/8b in sorted-id order, recommended)
         let cases = [
             ("no gpu 8gb", hw(8, None, false), [T, C, T, T], Some("m:4b")),
-            ("no gpu 32gb", hw(32, None, false), [T, C, T, S], Some("m:4b")),
-            ("8gb vram", hw(16, Some(8), false), [T, C, T, C], Some("m:8b")),
-            ("24gb vram", hw(32, Some(24), false), [C, C, T, C], Some("m:30b")),
+            (
+                "no gpu 32gb",
+                hw(32, None, false),
+                [T, C, T, S],
+                Some("m:4b"),
+            ),
+            (
+                "8gb vram",
+                hw(16, Some(8), false),
+                [T, C, T, C],
+                Some("m:8b"),
+            ),
+            (
+                "24gb vram",
+                hw(32, Some(24), false),
+                [C, C, T, C],
+                Some("m:30b"),
+            ),
             ("apple 16gb", hw(16, None, true), [T, C, T, C], Some("m:8b")),
         ];
         for (name, hw, expect, rec) in cases {
@@ -330,6 +380,30 @@ mod tests {
     }
 
     #[test]
+    fn recommended_skips_a_model_that_does_not_fit_on_disk() {
+        let mut h = hw(32, Some(24), false);
+        // 30b needs ~19.5 GiB of download, 8b ~5.2, 4b ~2.6: only the smaller two fit on disk.
+        h.free_disk_bytes = Some(8 * GIB_U);
+        let advice = recommend(&h, &cands());
+        assert_eq!(advice.recommended.as_deref(), Some("m:8b"));
+    }
+
+    #[test]
+    fn flag_like_ids_never_become_commands() {
+        let c = vec![
+            Candidate {
+                id: "-rf:8b".into(),
+                display_name: "x".into(),
+            },
+            Candidate {
+                id: "a b:8b".into(),
+                display_name: "x".into(),
+            },
+        ];
+        assert_eq!(recommend(&hw(32, Some(24), false), &c).models, Vec::new());
+    }
+
+    #[test]
     fn size_comes_from_the_id_tag_only() {
         assert_eq!(params_billions("qwen3:8b"), Some(8.0));
         assert_eq!(params_billions("llama3.3:70b-instruct-q4"), Some(70.0));
@@ -341,7 +415,7 @@ mod tests {
     #[test]
     fn real_catalog_yields_ollama_candidates_with_sizes() {
         let c = catalog_candidates();
-        assert!(!c.is_empty());
+        assert_ne!(c, Vec::new());
         assert!(c.iter().all(|c| params_billions(&c.id).is_some()));
         let advice = recommend(&hw(32, Some(24), false), &c);
         let best = advice.recommended.expect("a recommendation");
@@ -351,7 +425,11 @@ mod tests {
     #[test]
     fn path_lookup_only_checks_files() {
         let dir = tempfile::tempdir().expect("tmp");
-        let name = if cfg!(windows) { "ollama.exe" } else { "ollama" };
+        let name = if cfg!(windows) {
+            "ollama.exe"
+        } else {
+            "ollama"
+        };
         std::fs::write(dir.path().join(name), b"").expect("write");
         let var = std::env::join_paths([dir.path()]).expect("join");
         assert!(on_path("ollama", &var));
