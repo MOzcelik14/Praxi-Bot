@@ -4325,7 +4325,7 @@
       "notifyPrivate": "Gizli bildirimler",
       "notifyPrivateHint": "Yalnızca bot adını ve kısa, genel bir metin gösterir; içeriği asla göstermez.",
       "showAgentRoute": "Tüm yönlendirme kararlarını göster",
-      "showAgentRouteHint": "Bot turu kendisi yürüttüğünde de bir etiket gösterir (hata ayıklama için).",
+      "showAgentRouteHint": "Bot turu tek başına yönettiğinde de bir etiket gösterir (hata ayıklama için).",
       "title": "Bildirimler"
     },
     "onboarding": {
@@ -4364,7 +4364,7 @@
     },
     "providers": {
       "add": "Sağlayıcı ekle",
-      "addAndTest": "Ekle ve sına",
+      "addAndTest": "Ekle ve test et",
       "apiKey": "API anahtarı",
       "baseUrl": "Temel URL",
       "custom": "Özel (OpenAI uyumlu)",
@@ -4390,7 +4390,7 @@
       "restart": "Arka plan servisini yeniden başlat",
       "restartHint": "Değişikliğin geçerli olması için arka plan servisini yeniden başlat.",
       "restartManual": "Değişikliğin geçerli olması için arka plan servisini kendin yeniden başlat (bu uygulama başlatmadı).",
-      "test": "Bağlantıyı sına",
+      "test": "Bağlantıyı test et",
       "title": "Model sağlayıcıları"
     },
     "quiet": {
@@ -4452,7 +4452,7 @@
           "timeout": "Kurulum on dakikayı aştığı için durduruldu. Yeniden denemeden önce çıktıyı kontrol et."
         },
         "installLabel": "Kurulum komutu",
-        "installOutput": "Kurulum çıktısı (güvenilmeyen)",
+        "installOutput": "Kurulum çıktısı (doğrulanmamış)",
         "installRunning": "Kuruluyor… bu bölümden ayrılmak verilmiş onayı iptal etmez.",
         "installSummary": "{{engine}} kur veya güncelle",
         "loginLabel": "Giriş için",
@@ -4464,7 +4464,7 @@
         "offline": "Yerel servis çalışmıyor; algılanan kodlama araçları gösterilemiyor.",
         "onThisComputer": "Bu bilgisayarda",
         "pathLabel": "Konum",
-        "problem": "Bu olmadı.",
+        "problem": "İşlem başarısız oldu.",
         "refresh": "Yeniden tara",
         "retry": "Yeniden dene",
         "signIn": "Giriş yap",
@@ -4547,7 +4547,7 @@
       "description": "Botun neden çalışmadığını kontrol eder ve sık görülen sorunları düzeltir.",
       "empty": "Hiç denetim sonucu gelmedi",
       "hints": {
-        "browser": "Chrome, Edge ya da Chromium kur (snap paketi değil).",
+        "browser": "Chrome, Edge ya da Chromium kur (snap paketini değil).",
         "catalog_freshness": "Önerilen model listesi 90 günden eski; güncel modelleri görmek için Praxi'yi güncelleyin veya `bot catalog check` çalıştırın.",
         "cli_accounts": "Bir kez terminal açıp CLI'da oturum aç (örneğin `claude` ya da `codex login`).",
         "clock": "Sistem ayarlarında otomatik tarih ve saati aç.",
@@ -4567,7 +4567,7 @@
       "loadError": "Tanılama çalıştırılamadı",
       "notOnPlatform": "Bu platformda kullanılamaz.",
       "offline": "Yerel servis çalışmıyor. Tanılama için yeniden başlat.",
-      "privacy": "Tanılama yalnızca ayarlarını okur. Bir onarım yalnızca düğmesine tıkladığında çalışır.",
+      "privacy": "Tanılama sadece ayarlarını okur. Onarım ise yalnızca ilgili düğmeye tıkladığında çalışır.",
       "problems": "{{count}} öğe ilgi bekliyor",
       "problems_other": "{{count}} öğe ilgi bekliyor",
       "repair": {
@@ -4614,7 +4614,7 @@
         "limits": "Yazıldığı sırada ücretsiz plan: 3 gelen kutusu, ayda 3.000 e-posta, günde 100. Sınırlar değişebilir.",
         "nameHint": "Adres adı (isteğe bağlı)",
         "nameHintHelp": "@ işaretinden önceki kısım, örneğin atlas. Boş bırakırsan AgentMail seçer.",
-        "noColdOutreach": "Ortak agentmail.to alan adında soğuk tanıtım ve toplu e-posta yasaktır. Yalnızca senin ya da botunun gönderme nedeni olan postalar için kullan.",
+        "noColdOutreach": "Ortak agentmail.to alan adında istenmeyen tanıtım ve toplu e-posta göndermek yasaktır. Yalnızca senin ya da botunun gerçekten göndermesi gereken e-postalar için kullan.",
         "ownAccount": "Kendi ücretsiz AgentMail hesabın gerekir. Praxi-Bot senin yerine anahtar tutmaz: hesabındaki API anahtarını yapıştır.",
         "pricing": "Fiyat sayfasına bak",
         "title": "Bota kendi adresini ver",
@@ -4639,7 +4639,7 @@
         "imapPort": "1 ile 65535 arasında bir port gir.",
         "name": "1-64 harf, rakam, nokta, tire veya alt çizgi kullan; ad başka bir kutuda kullanılmasın.",
         "password": "Parolayı gir. Sunucu veya kullanıcı adını değiştirmek parolayı yeniden gerektirir.",
-        "senders": "Adres (ann@example.com) veya @alan_adı (@example.com) kullan.",
+        "senders": "E-posta adresi (ann@example.com) veya alan adı (@example.com) gir.",
         "smtpHost": "SMTP sunucu adını gir (boşluk ve port olmadan).",
         "smtpPort": "1 ile 65535 arasında bir port gir."
       },
@@ -4656,7 +4656,7 @@
         "imapHost": "IMAP sunucusu",
         "implicit": "TLS",
         "name": "Ad",
-        "nameHint": "Posta kutusu için kısa bir ad, örneğin is.",
+        "nameHint": "Posta kutusu için kısa bir ad, örneğin iş.",
         "password": "Parola veya uygulama parolası",
         "passwordHint": "Sistem anahtarlığında saklanır, bir daha gösterilmez. Çoğu sağlayıcı uygulama parolası ister.",
         "passwordKeep": "Kayıtlı parolayı korumak için boş bırak.",
@@ -4672,7 +4672,7 @@
         "save": "Kaydet",
         "security": "SMTP güvenliği",
         "senders": "İzinli gönderenler",
-        "sendersHint": "Adresler veya @alan_adları, her satıra bir tane. Gelecek gelen-posta özelliği için saklanır; şimdilik gelen postaya hiçbir şey tepki vermez.",
+        "sendersHint": "Adresler veya @alan adları, her satıra bir tane. Yakında eklenecek gelen posta özelliği için saklanır; şimdilik gelen e-postalara tepki verilmez.",
         "smtpHost": "SMTP sunucusu",
         "startTls": "STARTTLS",
         "username": "Kullanıcı adı",
@@ -4717,7 +4717,7 @@
         "title": "Hesap adı"
       },
       "frame": {
-        "description": "Uygulamanın kendi pencere düğmeleri yerine Windows başlık çubuğunu göster.",
+        "description": "Uygulamanın kendi pencere düğmeleri yerine sistem başlık çubuğunu göster.",
         "title": "Pencere çerçevesi"
       },
       "send": {
@@ -4850,7 +4850,7 @@
       "email": "Bağlı bir posta kutusu botların e-postalarını okumasını sağlar. Bir şey göndermeden önce yine de sana sorarlar.",
       "folders": "Botlar güvenilen klasörlerdeki dosyaları sormadan okuyup değiştirebilir. Yalnızca paylaşmaktan rahatsız olmayacağın klasörleri ekle.",
       "memory": "“Unut”, botun hatırladığını siler. Her zaman geri alınamaz.",
-      "permissions": "Burada daha fazla izin vermek botların sormadan iş yapmasına yol açar. Önce neyin ters gidebileceğini düşün.",
+      "permissions": "Burada daha fazla izin verirsen botlar sana sormadan işlem yapabilir. Önce nelerin ters gidebileceğini düşün.",
       "providers": "Bunu yalnızca sana kesin bilgi verildiyse değiştir. Yanlış bir giriş botlarının yanıt vermesini durdurabilir."
     },
     "safety": {
@@ -4874,7 +4874,7 @@
           "ask": "Para harcamak, tehlikeli komutlar ve güvenilmeyen bir sayfa okuduktan sonraki her şey.",
           "name": "Serbest",
           "own": "Dosya silmek ve mesaj göndermek dahil hemen her şey.",
-          "summary": "Botlar işe koyulur. Yalnızca en büyük riskler için sorar."
+          "summary": "Botlar işini kendisi halleder. Yalnızca en büyük risklerde durup sorar."
         }
       },
       "offline": "Yardımcıya henüz bağlı değil, bu yüzden seviye gösterilemiyor ya da değiştirilemiyor.",
@@ -4894,7 +4894,7 @@
     "updates": {
       "appVersion": "Masaüstü uygulaması",
       "daemon": "Daemon",
-      "daemonDescription": "Yerel bot serve işlemi.",
+      "daemonDescription": "Yerel arka plan bot servisi.",
       "description": "Uygulama ve daemon sürümleri.",
       "devBuild": "Geliştirme derlemesi",
       "how": {
@@ -4918,18 +4918,18 @@
       "configError": "web.toml yüklenemedi ({{message}}). Varsayılanlar gösteriliyor — aşağıda değişiklikleri kaydetmek dosyayı yenileyecektir.",
       "credentialsTitle": "Kendi sunucun ve API sağlayıcıları",
       "description": "Arama sağlayıcı öncelik sırası, API anahtarları ve canlı bağlantı testi.",
-      "fallbackNotes": "Başarılı olmadan önceki yedek hataları: {{details}}",
+      "fallbackNotes": "Başarılı olmadan önceki denemelerde alınan hatalar: {{details}}",
       "keyEmptyPlaceholder": "API anahtarı gir…",
       "keyStoredPlaceholder": "Anahtar kayıtlı (değiştirmek için yeni anahtar gir)",
-      "keyWriteOnlyHint": "Yalnızca yazılabilir: işletim sistemi gizli bilgi deposunda saklanır, geri okunmaz.",
+      "keyWriteOnlyHint": "Yalnızca kaydedilir: sistemin gizli bilgi deposunda saklanır, bir daha görüntülenmez.",
       "loadError": "Web araması ayarları yüklenemedi: {{message}}",
       "moveDown": "{{name}} sağlayıcısını aşağı taşı",
       "moveUp": "{{name}} sağlayıcısını yukarı taşı",
-      "note": "Web araması, sonuç dönen ilk etkin sağlayıcıya kadar öncelik sırasıyla dener. Değişiklikler yeniden başlatma olmadan bir sonraki turda uygulanır.",
+      "note": "Web araması, sonuç alana kadar etkin sağlayıcıları öncelik sırasıyla dener. Değişiklikler yeniden başlatma gerekmeden bir sonraki turda geçerli olur.",
       "orderHint": "Tercih ettiğin sağlayıcıları yukarı taşı. Anahtarsız yedekler hesap gerektirmez ancak zaman zaman hız sınırına takılabilir.",
       "orderTitle": "Sağlayıcı sırası ve yedekler",
       "save": "Değişiklikleri kaydet",
-      "searxngHint": "Kendi SearXNG örneğinin temel URL'si (devre dışı bırakmak için temizleyip kaydet).",
+      "searxngHint": "Kendi SearXNG sunucunun temel URL'si (kapatmak için boş bırakıp kaydet).",
       "searxngLabel": "SearXNG URL",
       "status": {
         "active": "Etkin",
