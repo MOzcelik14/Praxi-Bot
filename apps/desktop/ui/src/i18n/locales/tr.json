@@ -1184,11 +1184,15 @@
     },
     "chain": {
       "details": "Ayrıntılar",
+      "groupApp": "{{app}} ×{{count}}",
+      "groupSame": "{{what}} ×{{count}}",
       "problems_one": "{{count}} adım başarısız",
       "problems_other": "{{count}} adım başarısız",
       "slow": "Normalden uzun sürüyor",
       "started": "Başlangıç {{start}}",
       "startedFinished": "Başlangıç {{start}} · bitiş {{end}}",
+      "summary": "{{count}} adım · {{what}} · {{duration}}",
+      "summaryPlain": "{{count}} adım · {{duration}}",
       "thought": "{{duration}} düşündü",
       "working": "Adım adım ilerliyor"
     },
@@ -3314,6 +3318,16 @@
     "title": "Yeni bot"
   },
   "notify": {
+    "action": {
+      "allow": "İzin ver",
+      "always": "Her zaman izin ver",
+      "deny": "Reddet"
+    },
+    "approval": {
+      "mcp": "{{bot}}, {{app}} uygulamasını kullanmak istiyor ({{action}})",
+      "other": "{{bot}} devam etmek istiyor: {{what}}",
+      "title": "Onayınız gerekiyor"
+    },
     "detail": {
       "failed": "Başarısız: {{detail}}",
       "longRun": "{{detail}}",

@@ -1184,11 +1184,15 @@
     },
     "chain": {
       "details": "Details",
+      "groupApp": "{{app}} ×{{count}}",
+      "groupSame": "{{what}} ×{{count}}",
       "problems_one": "{{count}} Schritt fehlgeschlagen",
       "problems_other": "{{count}} Schritte fehlgeschlagen",
       "slow": "Dauert länger als üblich",
       "started": "Gestartet {{start}}",
       "startedFinished": "Gestartet {{start}} · beendet {{end}}",
+      "summary": "{{count}} Schritte · {{what}} · {{duration}}",
+      "summaryPlain": "{{count}} Schritte · {{duration}}",
       "thought": "Nachgedacht: {{duration}}",
       "working": "Arbeitet Schritt für Schritt"
     },
@@ -3314,6 +3318,16 @@
     "title": "Neuer Bot"
   },
   "notify": {
+    "action": {
+      "allow": "Erlauben",
+      "always": "Immer erlauben",
+      "deny": "Ablehnen"
+    },
+    "approval": {
+      "mcp": "{{bot}} möchte {{app}} verwenden ({{action}})",
+      "other": "{{bot}} möchte fortfahren: {{what}}",
+      "title": "Genehmigung erforderlich"
+    },
     "detail": {
       "failed": "Fehlgeschlagen: {{detail}}",
       "longRun": "{{detail}}",
