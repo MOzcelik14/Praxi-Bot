@@ -116,6 +116,7 @@ import { ServerTerminalProvider } from "./state/ServerTerminalContext";
 import { ComputerRequestModal } from "./components/ComputerAccess";
 import { HostEmptyState } from "./components/HostEmptyState";
 import { HostStateBanner } from "./components/HostStateBanner";
+import { SafeModeBanner } from "./components/SafeModeBanner";
 import { onboardingAllowed } from "./lib/hostMode";
 import {
   DaemonProvider,
@@ -948,6 +949,7 @@ function AppShell() {
           </div>
         </div>
         {activeComputerId === LOCAL_COMPUTER ? <HealthIndicator /> : null}
+        <SafeModeBanner />
         <HostStateBanner />
         <ShellBridgeHost
           settings={settings}

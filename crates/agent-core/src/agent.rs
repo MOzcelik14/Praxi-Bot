@@ -30,8 +30,8 @@ use crate::shared::{
     ApprovalScope, COMPUTER_IDENTITY_UNBOUND_NOTICE, COMPUTER_PREPARE_TIMEOUT_NOTICE,
     CategoryDecision, Delivery, EffectivePolicy, Grant, GrantTarget, Grants, LoopError,
     MessageMode, ModelOut, Pending, Providers, STEP_MODEL, STEP_NUDGE, STEP_TOOLS, STEP_USER,
-    ScheduleWork, Shared, StreamItem, Verdict, initiator_of, kind_for, kind_for_mention,
-    kind_for_schedule, mention_message_id,
+    ScheduleWork, Shared, StreamItem, Verdict, initiator_of, is_occurrence_kind, kind_for,
+    kind_for_mention, kind_for_schedule, mention_message_id, occurrence_kind,
 };
 use crate::{AUDIT_GRANT_ALWAYS, AUDIT_GRANT_INERT, AUDIT_GRANT_REVOKED};
 
@@ -732,6 +732,11 @@ impl AgentLoop {
         name: &str,
         params: BTreeMap<String, String>,
     ) -> Result<RunId> {
+        if self.sh.cfg.safe_mode {
+            return Err(LoopError::Router(
+                "workflows are disabled in safe mode".into(),
+            ));
+        }
         let chat = self
             .sh
             .storage
@@ -878,6 +883,11 @@ impl AgentLoop {
         credential_id: Uuid,
         work: ScheduleWork,
     ) -> Result<RunId> {
+        if self.sh.cfg.safe_mode && !matches!(work, ScheduleWork::Prompt(_)) {
+            return Err(LoopError::Profile(
+                "tool calls are disabled in safe mode".into(),
+            ));
+        }
         let text = match &work {
             ScheduleWork::Prompt(text) => text.clone(),
             ScheduleWork::Tool { .. } => "External agent requested a computer tool call.".into(),
@@ -914,6 +924,11 @@ impl AgentLoop {
         schedule_id: TaskId,
         work: ScheduleWork,
     ) -> Result<RunId> {
+        if self.sh.cfg.safe_mode && !matches!(work, ScheduleWork::Prompt(_)) {
+            return Err(LoopError::Profile(
+                "scheduled tools and workflows are disabled in safe mode".into(),
+            ));
+        }
         let text = match &work {
             ScheduleWork::Prompt(t) => t.clone(),
             ScheduleWork::Workflow { name, params } => {
@@ -933,6 +948,78 @@ impl AgentLoop {
         )
     }
 
+    /// Like [`Self::run_scheduled`] for occurrence `due_ms` of the schedule, attempt
+    /// `attempt`. The key `schedule:due:attempt` is stored in the run's durable
+    /// `kind`: starting the same key again (a retry after a restart, a double
+    /// click) returns the EXISTING run instead of creating a second one.
+    ///
+    /// # Errors
+    /// As [`Self::run_scheduled`].
+    pub fn run_scheduled_occurrence(
+        &self,
+        chat_id: ChatId,
+        schedule_id: TaskId,
+        due_ms: i64,
+        attempt: u32,
+        work: ScheduleWork,
+    ) -> Result<RunId> {
+        let kind = occurrence_kind(false, schedule_id, due_ms, attempt);
+        if let Some(run) = self.existing_occurrence_run(chat_id, &kind)? {
+            return Ok(run);
+        }
+        let text = Self::scheduled_text(&work);
+        let directive = (!matches!(work, ScheduleWork::Prompt(_))).then_some(work);
+        self.start_turn(chat_id, &text, &kind, directive, None)
+    }
+
+    /// [`Self::run_scheduled_external`] with the idempotency key of
+    /// [`Self::run_scheduled_occurrence`].
+    ///
+    /// # Errors
+    /// As [`Self::run_scheduled_external`].
+    pub fn run_scheduled_external_occurrence(
+        &self,
+        chat_id: ChatId,
+        schedule_id: TaskId,
+        due_ms: i64,
+        attempt: u32,
+        work: ScheduleWork,
+        note: Option<&str>,
+    ) -> Result<RunId> {
+        let kind = occurrence_kind(true, schedule_id, due_ms, attempt);
+        if let Some(run) = self.existing_occurrence_run(chat_id, &kind)? {
+            return Ok(run);
+        }
+        self.run_scheduled_external_kind(chat_id, work, note, &kind)
+    }
+
+    fn scheduled_text(work: &ScheduleWork) -> String {
+        match work {
+            ScheduleWork::Prompt(t) => t.clone(),
+            ScheduleWork::Workflow { name, params } => {
+                format!("Scheduled: run the saved workflow `{name}` with {params:?}.")
+            }
+            ScheduleWork::Tool { name, input } => {
+                format!("Scheduled: call the tool `{name}` with {input}.")
+            }
+        }
+    }
+
+    /// The run already started under occurrence key `kind`, if any.
+    fn existing_occurrence_run(&self, chat_id: ChatId, kind: &str) -> Result<Option<RunId>> {
+        if !is_occurrence_kind(kind) {
+            return Ok(None);
+        }
+        let Some(chat) = self.sh.storage.get_chat(chat_id)? else {
+            return Ok(None);
+        };
+        Ok(self
+            .sh
+            .storage
+            .find_run_by_kind(chat.user_id, kind)?
+            .map(|r| r.id))
+    }
+
     /// Start an externally supplied scheduled run in a new, isolated chat.
     /// The durable initiator survives resume and is inherited by all children.
     ///
@@ -944,6 +1031,21 @@ impl AgentLoop {
         schedule_id: TaskId,
         work: ScheduleWork,
         note: Option<&str>,
+    ) -> Result<RunId> {
+        self.run_scheduled_external_kind(
+            chat_id,
+            work,
+            note,
+            &format!("turn:external_schedule:{schedule_id}"),
+        )
+    }
+
+    fn run_scheduled_external_kind(
+        &self,
+        chat_id: ChatId,
+        work: ScheduleWork,
+        note: Option<&str>,
+        kind: &str,
     ) -> Result<RunId> {
         if !self.sh.storage.list_messages(chat_id)?.is_empty() {
             return Err(LoopError::Profile(
@@ -962,13 +1064,7 @@ impl AgentLoop {
             text.push_str(note);
         }
         let directive = (!matches!(work, ScheduleWork::Prompt(_))).then_some(work);
-        self.start_turn(
-            chat_id,
-            &text,
-            &format!("turn:external_schedule:{schedule_id}"),
-            directive,
-            None,
-        )
+        self.start_turn(chat_id, &text, kind, directive, None)
     }
 
     /// `handoff`: the just-concluded run that still holds the chat's `active`
@@ -1101,6 +1197,13 @@ impl AgentLoop {
         }
         let run_id = {
             let mut active = self.sh.active.lock();
+            // Same occurrence key twice (concurrent retries, retry after a
+            // restart): hand back the run that already exists.
+            if is_occurrence_kind(kind)
+                && let Some(existing) = self.sh.storage.find_run_by_kind(chat.user_id, kind)?
+            {
+                return Ok(existing.id);
+            }
             if active
                 .get(&chat_id)
                 .is_some_and(|held| Some(*held) != handoff)

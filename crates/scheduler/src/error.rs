@@ -41,6 +41,14 @@ pub enum SchedulerError {
     #[error("schedule {0} is already running")]
     Busy(String),
 
+    /// Operation conflicts with the current occurrence or schedule state.
+    #[error("conflict: {0}")]
+    Conflict(String),
+
+    /// A manual retry came too soon after the previous attempt.
+    #[error("rate limited: {0}")]
+    RateLimited(String),
+
     /// Webhook HMAC-SHA256 signature verification failed.
     #[error("invalid webhook HMAC-SHA256 signature")]
     InvalidSignature,

@@ -148,7 +148,11 @@ export interface DaemonContextValue {
     outcome: "stored" | "cancelled"
   ) => void;
   retry: () => void;
-  restartDaemon: () => Promise<void>;
+  /**
+   * Stop and start the service the app owns again. `safe` true = safe mode, false = normal start,
+   * absent = keep the current mode.
+   */
+  restartDaemon: (safe?: boolean) => Promise<void>;
   /**
    * A send failed because nothing answered. This computer's own service is probed and, if it is
    * down, started the way the app does at launch (`hostStarting` is true meanwhile); a paired
@@ -720,6 +724,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
           token: c.token,
           started_by_app: false,
           fake_provider: false,
+          safe_mode: false,
           data_dir: ""
         });
         void refreshHosts();
@@ -757,7 +762,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
         .then((c) => {
           if (activeIdRef.current === wanted) {
             setHostError(null);
-            setHostConn({ base_url: c.base_url, token: c.token, started_by_app: false, fake_provider: false, data_dir: "" });
+            setHostConn({ base_url: c.base_url, token: c.token, started_by_app: false, fake_provider: false, safe_mode: false, data_dir: "" });
           }
         })
         .catch(() => {});
@@ -843,10 +848,10 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
     return startingRef.current;
   }, []);
   const retry = useCallback(() => setAttempt((n) => n + 1), []);
-  const restartDaemon = useCallback(async () => {
+  const restartDaemon = useCallback(async (safe?: boolean) => {
     setPhase("connecting");
     try {
-      const c = await connectDaemon(true);
+      const c = await connectDaemon(true, typeof safe === "boolean" ? safe : undefined);
       setLocalConn(c);
       setPhase("ready");
       setError(null);

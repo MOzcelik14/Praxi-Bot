@@ -2212,6 +2212,10 @@
         "hint": "It runs there and is frozen on this computer. Use Bring back to this computer on its row.",
         "title": "That schedule moved to a server"
       },
+      "schedule_retry_limited": {
+        "hint": "Wait a moment before retrying this run again. Retries of the same run are spaced at least 30 seconds apart.",
+        "title": "Retried too quickly"
+      },
       "secret_request_exists": {
         "hint": "Ask the bot to replace it explicitly, or pick another name. Nothing was changed.",
         "title": "This name is already taken"
@@ -3410,13 +3414,48 @@
     "waiting": "Waiting for your approval: {{step}}",
     "working": "Working…"
   },
+  "safeMode": {
+    "banner": {
+      "body": "Tools, schedules and channels are off. You can still chat, read and change settings.",
+      "leave": "Restart normally",
+      "leaveManual": "Restart the service without --safe (and without BOT_SAFE_MODE) to leave.",
+      "title": "Safe mode."
+    },
+    "settings": {
+      "activeTitle": "Safe mode is on",
+      "description": "Start with everything that acts by itself switched off.",
+      "enter": "Restart in safe mode",
+      "explain": "Restarts the local service with tools, schedules, channels, MCP servers and apps off. Chat still answers, nothing is deleted or changed, and running work is paused. Restart normally to get everything back.",
+      "inactiveTitle": "Safe mode is off",
+      "manual": "This app did not start the service, so it cannot restart it. Start it with `bot serve --safe` to use safe mode.",
+      "title": "Safe mode"
+    },
+    "startup": {
+      "button": "Start in safe mode",
+      "hint": "Starts the service with tools, schedules and channels off, so you can fix the problem. Nothing is deleted."
+    }
+  },
   "schedules": {
     "bot": "Bot",
+    "calendar": {
+      "dayEmpty": "No scheduled runs or history on {{date}}.",
+      "daySummary": "{{date}}: {{upcoming}} upcoming, {{outcomes}} recorded",
+      "gridLabel": "Schedule calendar for {{month}}",
+      "historyHeading": "Recorded",
+      "nextMonth": "Next month",
+      "prevMonth": "Previous month",
+      "today": "Today",
+      "upcomingHeading": "Upcoming"
+    },
     "cancel": "Cancel",
     "confirmDelete": "Yes, delete",
     "delete": "Delete",
     "deletedBot": "Deleted bot",
     "does": "What it does",
+    "dueAt": "Scheduled {{when}}",
+    "durationHours": "{{hours}}h {{minutes}}m",
+    "durationMinutes": "{{minutes}}m {{seconds}}s",
+    "durationSeconds": "{{seconds}}s",
     "edit": "Edit",
     "empty": {
       "hint": "Create one to have a bot run a prompt automatically, for example every weekday at 9.",
@@ -3424,9 +3463,12 @@
       "title": "No scheduled tasks yet"
     },
     "enabled": "Enabled",
+    "filterAll": "All",
+    "filterIssues": "Failed & missed",
     "form": {
       "botFixed": "The bot of a schedule cannot be changed.",
       "cannotParse": "That phrase was not understood. Try \"every day at 9\" or use cron.",
+      "cannotPreview": "Could not preview this schedule. Check the syntax and timezone.",
       "create": "Create",
       "cron": "Cron expression",
       "cronHint": "Five fields, optionally followed by a timezone.",
@@ -3453,6 +3495,7 @@
       },
       "name": "Name",
       "newTitle": "New scheduled task",
+      "nextRunsTitle": "Next 5 runs ({{tz}})",
       "noFirstRun": "no upcoming run",
       "payloadKept": "This schedule runs a workflow or tool; that part stays unchanged.",
       "preview": "Preview",
@@ -3462,8 +3505,13 @@
       "text": "Schedule in words",
       "textHint": "English or Turkish. Times use {{tz}}.",
       "textPlaceholder": "every weekday at 9, her gün 09:00",
+      "tz": "Timezone",
+      "tzCronHint": "Used if the cron expression has 5 fields without a timezone.",
       "when": "When"
     },
+    "history": "Run history",
+    "historyEmpty": "No runs or missed occurrences recorded yet.",
+    "historyEmptyFiltered": "No failed or missed runs.",
     "lastRun": "Last run",
     "loading": "Loading schedules…",
     "missed": "Missed while off",
@@ -3471,6 +3519,8 @@
     "never": "Never",
     "new": "New schedule",
     "nextRun": "Next run",
+    "nextRuns": "Next 5 runs",
+    "nextRunsEmpty": "No upcoming runs.",
     "noRuns": "No runs seen yet.",
     "openRun": "Open",
     "originBot": "Made by bot",
@@ -3486,11 +3536,23 @@
     "reclaimUnreachable": "{{name}} did not answer, so its copy may still be running there. Bringing it back now could run it on both computers.",
     "reclaimed": "{{name}} is back on this computer.",
     "refresh": "Refresh",
+    "retry": "Retry",
+    "retryStarted": "Retrying missed occurrence of {{name}}.",
     "run": {
+      "cancelled": "Cancelled",
+      "dispatched": "Starting",
       "failed": "Failed",
+      "interrupted": "Interrupted",
+      "missed": "Missed",
+      "paused": "Paused",
+      "pending": "Pending",
+      "queued": "Queued",
       "running": "Running",
-      "succeeded": "Succeeded"
+      "started": "Running",
+      "succeeded": "Succeeded",
+      "waiting_approval": "Waiting approval"
     },
+    "runAgain": "Run again",
     "runNow": "Run now",
     "runNowStarted": "{{name}} started.",
     "spec": {
@@ -3511,6 +3573,8 @@
     },
     "subtitle": "Things your bots do on a timer: every morning, every hour, or once.",
     "title": "Scheduled tasks",
+    "viewCalendar": "Calendar",
+    "viewList": "List",
     "when": "When"
   },
   "secretRequest": {

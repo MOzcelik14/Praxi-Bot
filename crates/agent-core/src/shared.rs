@@ -1117,10 +1117,32 @@ pub(crate) fn kind_for_schedule(id: TaskId) -> String {
     format!("{KIND_PREFIX}:schedule:{id}")
 }
 
-/// The schedule behind a run kind written by [`kind_for_schedule`].
+/// Durable idempotency key of one scheduled occurrence attempt, stored in the
+/// run's `kind`: `turn:[external_]schedule:<id>:<due_ms>:<attempt>`. A repeated
+/// start with the same key returns the existing run, also after a restart.
+#[must_use]
+pub fn occurrence_kind(external: bool, id: TaskId, due_ms: i64, attempt: u32) -> String {
+    let prefix = if external {
+        "external_schedule"
+    } else {
+        "schedule"
+    };
+    format!("{KIND_PREFIX}:{prefix}:{id}:{due_ms}:{attempt}")
+}
+
+/// Whether `kind` carries an occurrence idempotency key.
+pub(crate) fn is_occurrence_kind(kind: &str) -> bool {
+    kind.strip_prefix("turn:schedule:")
+        .or_else(|| kind.strip_prefix("turn:external_schedule:"))
+        .is_some_and(|rest| rest.split(':').count() == 3)
+}
+
+/// The schedule behind a run kind written by [`kind_for_schedule`] or [`occurrence_kind`].
 pub fn schedule_id_of(kind: &str) -> Option<TaskId> {
     kind.strip_prefix("turn:schedule:")
         .or_else(|| kind.strip_prefix("turn:external_schedule:"))?
+        .split(':')
+        .next()?
         .parse()
         .ok()
         .map(TaskId)
@@ -1840,7 +1862,8 @@ impl Shared {
     /// visibility (an MCP server's `bots` list).  Call-time enforcement stays
     /// in the tool itself; this keeps hidden tools out of what the model sees.
     pub(crate) fn spec_visible(&self, profile: &BotProfile, bot: BotId, spec: &ToolSpec) -> bool {
-        profile.spec_visible(&spec.name, spec.category)
+        !self.cfg.safe_mode
+            && profile.spec_visible(&spec.name, spec.category)
             && platform_ok(&spec.platforms)
             // Fail closed: a name the registry no longer knows is not visible.
             && self
@@ -1941,6 +1964,9 @@ impl Shared {
     /// `hints` (a router `ToolHint`) narrows the turn to those tools plus the
     /// discovery meta-tools, so the model can still reach everything else.
     pub fn model_specs(&self, profile: &BotProfile, bot: BotId, hints: &[String]) -> Vec<ToolSpec> {
+        if self.cfg.safe_mode {
+            return Vec::new();
+        }
         if !hints.is_empty() {
             let narrowed = self
                 .surface
@@ -1968,6 +1994,10 @@ impl Shared {
         input: &serde_json::Value,
         hints: &[String],
     ) -> Option<Resolved> {
+        // Safe mode: nothing resolves, so nothing runs (fail closed).
+        if self.cfg.safe_mode {
+            return None;
+        }
         let tool = if hints.is_empty() {
             self.surface
                 .resolve_with(name, &|s| self.spec_visible(profile, bot, s))?
