@@ -13,6 +13,7 @@
   --space-5: 20px;
   --space-6: 24px;
   --space-8: 32px;
+  --titlebar-h: var(--space-8);
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
@@ -191,6 +192,7 @@
   --center-highlight: inset 0 0 0 transparent;
   --center-shadow: var(--shadow-card);
   --center-scrim: transparent;
+  --message-plate-fill: transparent;
   --composer-fill: var(--color-surface-elevated);
   --composer-filter: none;
   --float-fill: #191a1f;

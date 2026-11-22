@@ -315,6 +315,10 @@
       "sky": "Gökyüzü",
       "theme": "Temayı izle",
       "title": "Duvar kağıdı",
+      "veil": "Duvar kağıdı perdesi",
+      "veilClear": "Net",
+      "veilHint": "Duvar kağıdının tamamı üzerinde yumuşak bir ton. Mesajlar kendi hafif zeminlerinde durur, bu yüzden metin her ayarda okunaklı kalır.",
+      "veilSoft": "Yumuşak",
       "warm": "Sıcak"
     }
   },

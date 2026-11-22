@@ -315,6 +315,10 @@
       "sky": "Sky",
       "theme": "Follow theme",
       "title": "Wallpaper",
+      "veil": "Wallpaper veil",
+      "veilClear": "Clear",
+      "veilHint": "A soft tint over the whole wallpaper. Messages sit on their own light plates, so text stays readable at any setting.",
+      "veilSoft": "Soft",
       "warm": "Warm"
     }
   },

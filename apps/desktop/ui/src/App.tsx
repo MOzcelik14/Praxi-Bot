@@ -483,7 +483,17 @@ function AppShell() {
   }, [settings.windowFrame]);
 
   // Native frame off (the default on Windows): the app draws the window controls.
-  const customChrome = isTauriRuntime() && !settings.windowFrame;
+  // `?mock=1&chrome=1` previews the strip in a plain browser (inert buttons) for layout checks.
+  const previewChrome = isMockMode() && new URLSearchParams(window.location.search).get("chrome") === "1";
+  const customChrome = (isTauriRuntime() && !settings.windowFrame) || previewChrome;
+  // Panels start below the reserved strip (see Sidebar.module.css); html[data-chrome] drives that.
+  useEffect(() => {
+    if (!customChrome) return undefined;
+    document.documentElement.dataset.chrome = "custom";
+    return () => {
+      delete document.documentElement.dataset.chrome;
+    };
+  }, [customChrome]);
 
   const handleLanguageChange = (language: SupportedLanguage) => {
     void i18n.changeLanguage(language);
@@ -540,7 +550,7 @@ function AppShell() {
   const shellSettings = useMemo(
     () =>
       wallpaperKind
-        ? { ...settings, backdrop: wallpaperSceneId(wallpaperKind), backdropDim: WALLPAPER_DIM }
+        ? { ...settings, backdrop: wallpaperSceneId(wallpaperKind), backdropDim: WALLPAPER_DIM, veil: settings.wallpaperVeil }
         : settings,
     [settings, wallpaperKind]
   );
@@ -943,7 +953,7 @@ function AppShell() {
               <ChevronDown aria-hidden="true" />
             </button>
           ) : <span />}
-          <div className={`${styles.windowActions} ${customChrome ? styles.windowActionsReserve : ""}`} data-tauri-drag-region>
+          <div className={styles.windowActions} data-tauri-drag-region>
             <ComputerPicker />
             <button className={styles.iconButton} title={t("account.settings")} aria-label={t("account.settings")} onClick={() => setSettingsOpen("general")}><Settings2 /></button>
           </div>

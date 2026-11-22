@@ -315,6 +315,10 @@
       "sky": "Himmel",
       "theme": "Design folgen",
       "title": "Hintergrundbild",
+      "veil": "Hintergrund-Schleier",
+      "veilClear": "Klar",
+      "veilHint": "Ein sanfter Schleier über dem ganzen Hintergrund. Nachrichten liegen auf eigenen hellen Flächen, daher bleibt der Text bei jeder Einstellung lesbar.",
+      "veilSoft": "Sanft",
       "warm": "Warm"
     }
   },
